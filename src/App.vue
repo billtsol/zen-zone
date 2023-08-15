@@ -1,23 +1,42 @@
 <template>
-	<div class="flex flex-col">
-		<app-header></app-header>
-		<main class="">
-			<sudoku-game></sudoku-game>
-		</main>
-		<app-footer></app-footer>
+	<app-header></app-header>
+	<router-view v-if="!isLoading"></router-view>
+	<div class="page_loader text-center mt-40" v-else>
+		<appLoader />
 	</div>
 </template>
 
 <script>
-import appFooter from './components/Footer.vue';
-import sudokuGame from './components/Games/sudoku.vue';
+import { mapGetters } from 'vuex';
+
 import appHeader from './components/Header.vue';
+import appLoader from './components/Utils/Loader.vue';
 
 export default {
 	components: {
 		appHeader,
-		appFooter,
-		sudokuGame,
+		appLoader,
+	},
+	computed: {
+		...mapGetters({
+			toastMsg: 'notify/getToastMsg',
+			isLoading: 'notify/isLoading',
+		}),
+	},
+	data() {
+		return {};
+	},
+	watch: {
+		toastMsg(toastMsg) {
+			if (toastMsg[0] === true) {
+				if (toastMsg[2] === 'error') {
+					this.$toast.error(toastMsg[1]);
+				}
+				if (toastMsg[2] === 'success') {
+					this.$toast.success(toastMsg[1]);
+				}
+			}
+		},
 	},
 };
 </script>
