@@ -1,8 +1,6 @@
 <template>
 	<div class="flex flex-col">
-		<main class="">
-			<sudoku-game></sudoku-game>
-		</main>
+		<main class="flex justify-center">MAIN</main>
 		<app-footer></app-footer>
 	</div>
 </template>

@@ -12,7 +12,7 @@
 				<li
 					class="p-1 px-2 rounded text-lg text-gray-100 cursor-pointer hover:bg-blue-800 inline"
 				>
-					Games
+					<router-link to="/sudoku"> Games </router-link>
 				</li>
 				<li
 					class="inline p-1 px-2 rounded text-lg text-gray-100 cursor-pointer hover:bg-blue-800"

@@ -51,7 +51,6 @@ const authModule = {
 		// NEW USER
 		async signup({ commit }, payload) {
 			try {
-				console.log('mpike');
 				commit('notify/setLoading', true, { root: true });
 
 				const userCredential = await createUserWithEmailAndPassword(

@@ -1,7 +1,9 @@
 <template>
-	<div class="lds-ripple">
-		<div></div>
-		<div></div>
+	<div class="flex fixed h-full w-full justify-center">
+		<div class="lds-ripple m-32">
+			<div></div>
+			<div></div>
+		</div>
 	</div>
 </template>
 

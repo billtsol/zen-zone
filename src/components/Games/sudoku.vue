@@ -1,49 +1,120 @@
 <template>
-	<div class="flex flex-col items-center">
-		<div class="sudoku-board sm:mt-14 sm:mb-20 border-4 border-gray-700">
-			<div
-				v-for="(row, row_index) in sudoku"
-				:key="row_index"
-				class="w-full flex flex-row justify-around text-center"
-			>
-				<span
-					v-for="(number, col_index) in row"
-					:key="col_index"
-					class="sudoku-number select-none cursor-default w-full sm:p-1 sm:text-3xl border-gray-400 sm:pt-2 sm:pb-2 text-sm"
-					:class="addBorder(row_index, col_index)"
-					v-text="number == 0 ? ' ' : number"
+	<div class="flex flex-col items-center pt-10">
+		<div class="flex flex-col">
+			<div class="flex flex-row place-content-between sm:text-xl text-xs">
+				<span class="">Mistakes: {{ mistakes }} / 3</span>
+				<span class="mr-4"> {{ sudoku.difficulty }} </span>
+				<span class="">Time: {{ timeConvertor() }}</span>
+			</div>
+			<div class="sudoku-board sm:mb-20 border-4 rounded border-gray-700">
+				<div
+					v-if="solved"
+					class="w-full h-full flex flex-col justify-center items-center"
 				>
-				</span>
+					<span class="text-3xl">{{ gameOverMessage }}</span>
+
+					<div
+						class="select-none cursor-pointer border-none rounded-lg p-3 bg-blue-100 hover:bg-blue-300 sm:text-xl text-xs"
+						@click="newGame()"
+					>
+						New Game
+					</div>
+				</div>
+				<div
+					v-else
+					v-for="(row, row_index) in sudoku.value"
+					:key="row_index"
+					class="w-full flex flex-row justify-around text-center"
+				>
+					<span
+						v-for="(number, col_index) in row"
+						:key="col_index"
+						class="sudoku-number select-none cursor-default w-full sm:p-1 sm:text-3xl border-gray-400 sm:pt-2 sm:pb-2 text-sm bg-blue-100 hover:bg-blue-300"
+						:class="[
+							addBorder(row_index, col_index),
+							number == currentNumber && currentNumber != 0
+								? 'bg-blue-300'
+								: 'bg-blue-100',
+						]"
+					>
+						<div
+							class="w-full h-full"
+							:class="[
+								currentNumber == 0 ? 'cursor-default' : 'cursor-pointer',
+							]"
+							v-text="number == 0 ? ' ' : number"
+							@click="setNumberInBoard(row_index, col_index)"
+						></div>
+					</span>
+				</div>
+				<div
+					class="select-none w-full flex flex-row items-center justify-around mt-4"
+				>
+					<div
+						v-for="num in numberList"
+						class="sudoku-number m-1 border-2 cursor-pointer sm:text-3xl sm:pt-2 sm:pb-2 p-l text-center rounded-md text-sm bg-blue-100 hover:bg-blue-300"
+						:class="[currentNumber == num ? 'bg-blue-300' : 'bg-blue-100']"
+						@click="setCurrectNumber(num)"
+					>
+						<span class="w-full h-full align-middle">{{ num }}</span>
+					</div>
+				</div>
 			</div>
 		</div>
-		<span @click="shuffleSudoku()" class="p-3 border-4">Test</span>
 	</div>
 </template>
 <script>
+import { mapActions, mapGetters } from 'vuex';
 export default {
-	beforeMount() {
-		this.fillGrid(this.sudoku);
-		this.solved = this.sudoku;
+	components: {},
+	computed: {
+		...mapGetters({
+			sudoku: 'sudoku/getSudokuData',
+		}),
+	},
+	created() {
+		this.increaseTime();
 	},
 	data() {
 		return {
 			numberList: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-			sudoku: [
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0, 0, 0, 0, 0],
-			],
-			solved: [],
 			counter: 0,
+			solved: false,
+			currentNumber: 0,
+			mistakes: 0,
+			gameOverMessage: '',
+			time: 0,
 		};
 	},
 	methods: {
+		...mapActions({
+			sudokuGenerator: 'sudoku/generateSudoku',
+		}),
+		increaseTime() {
+			setInterval(() => {
+				this.time = parseInt(this.time) + 1;
+			}, 1000);
+		},
+		timeConvertor() {
+			let str = ['0', '0', '0', '0'];
+
+			let minutes = Math.floor(this.time / 60);
+			let seconds = this.time % 60;
+
+			if (parseInt(seconds / 10) >= 1) {
+				str[3] = (seconds % 10) + '';
+				str[2] = parseInt(seconds / 10) + '';
+			} else {
+				str[3] = (seconds % 10) + '';
+			}
+			if (parseInt(minutes / 10) >= 1) {
+				str[1] = (minutes % 10) + '';
+				str[0] = parseInt(minutes / 10) + '';
+			} else {
+				str[1] = (minutes % 10) + '';
+			}
+			return str[0] + str[1] + ':' + str[2] + str[3];
+		},
 		addBorder(row_index, col_index) {
 			if (col_index == 2 || col_index == 5) {
 				if (row_index == 2 || row_index == 5) {
@@ -55,198 +126,45 @@ export default {
 			}
 			return '';
 		},
-		shuffle(array) {
-			array.sort(() => Math.random() - 0.5);
-		},
-		checkGrid(grid) {
-			for (let i = 0; i < 9; i++) {
-				for (let j = 0; j < 9; j++) {
-					if (grid[i][j] == 0) {
+		checkSolved() {
+			for (let row = 0; row < 9; row++) {
+				for (let col = 0; col < 9; col++) {
+					if (this.sudoku[row][vol] == 0) {
 						return false;
 					}
 				}
 			}
 			return true;
 		},
-		forFuntion(n1, n2, n3, start, end, grid) {
-			let table = [];
-			for (let i = start; i < end; i++) {
-				table.push([grid[i][n1], grid[i][n2], grid[i][n3]]);
-			}
-			return table;
+		setCurrectNumber(number) {
+			this.currentNumber = number;
 		},
-		fillGrid(grid) {
-			for (let i = 0; i < 81; i++) {
-				var row = parseInt(i / 9);
-				var col = parseInt(i % 9);
 
-				if (grid[row][col] == 0) {
-					this.shuffle(this.numberList);
-
-					for (let j = 0; j < this.numberList.length; j++) {
-						let value = this.numberList[j];
-
-						if (!grid[row].includes(value)) {
-							if (
-								[
-									grid[0][col],
-									grid[1][col],
-									grid[2][col],
-									grid[3][col],
-									grid[4][col],
-									grid[5][col],
-									grid[6][col],
-									grid[7][col],
-									grid[8][col],
-								].includes(value) == false
-							) {
-								let square = [];
-								if (row < 3) {
-									if (col < 3) {
-										square = this.forFuntion(0, 1, 2, 0, 3, grid);
-									} else if (col < 6) {
-										square = this.forFuntion(3, 4, 5, 0, 3, grid);
-									} else {
-										square = this.forFuntion(6, 7, 8, 0, 3, grid);
-									}
-								} else if (row < 6) {
-									if (col < 3) {
-										square = this.forFuntion(0, 1, 2, 3, 6, grid);
-									} else if (col < 6) {
-										square = this.forFuntion(3, 4, 5, 3, 6, grid);
-									} else {
-										square = this.forFuntion(6, 7, 8, 3, 6, grid);
-									}
-								} else {
-									if (col < 3) {
-										square = this.forFuntion(0, 1, 2, 6, 9, grid);
-									} else if (col < 6) {
-										square = this.forFuntion(3, 4, 5, 6, 9, grid);
-									} else {
-										square = this.forFuntion(6, 7, 8, 6, 9, grid);
-									}
-								}
-								if (
-									[...square[0], ...square[1], ...square[2]].includes(value) ==
-									false
-								) {
-									grid[row][col] = value;
-									if (this.checkGrid(grid)) {
-										return true;
-									} else {
-										if (this.fillGrid(grid)) {
-											return true;
-										}
-									}
-								}
-							}
-						}
+		setNumberInBoard(row, col) {
+			if (this.sudoku.value[row][col] == 0 && this.currentNumber != 0) {
+				if (this.currentNumber == this.sudoku.solution[row][col]) {
+					this.$store.dispatch('sudoku/setNumber', {
+						row: row,
+						col: col,
+						number: this.currentNumber,
+					});
+					if (this.checkSolved()) {
+						this.gameOverMessage = 'You won!';
+						this.solved = true;
 					}
-					break;
-				}
-			}
-			grid[row][col] = 0;
-		},
-		solveGrid(grid) {
-			for (let i = 0; i < 81; i++) {
-				var row = parseInt(i / 9);
-				var col = parseInt(i % 9);
-
-				if (grid[row][col] == 0) {
-					for (let value = 1; value < 10; value++) {
-						if (!grid[row].includes(value)) {
-							if (
-								[
-									grid[0][col],
-									grid[1][col],
-									grid[2][col],
-									grid[3][col],
-									grid[4][col],
-									grid[5][col],
-									grid[6][col],
-									grid[7][col],
-									grid[8][col],
-								].includes(value) == false
-							) {
-								let square = [];
-								if (row < 3) {
-									if (col < 3) {
-										square = this.forFuntion(0, 1, 2, 0, 3, grid);
-									} else if (col < 6) {
-										square = this.forFuntion(3, 4, 5, 0, 3, grid);
-									} else {
-										square = this.forFuntion(6, 7, 8, 0, 3, grid);
-									}
-								} else if (row < 6) {
-									if (col < 3) {
-										square = this.forFuntion(0, 1, 2, 3, 6, grid);
-									} else if (col < 6) {
-										square = this.forFuntion(3, 4, 5, 3, 6, grid);
-									} else {
-										square = this.forFuntion(6, 7, 8, 3, 6, grid);
-									}
-								} else {
-									if (col < 3) {
-										square = this.forFuntion(0, 1, 2, 6, 9, grid);
-									} else if (col < 6) {
-										square = this.forFuntion(3, 4, 5, 6, 9, grid);
-									} else {
-										square = this.forFuntion(6, 7, 8, 6, 9, grid);
-									}
-								}
-								if (
-									[...square[0], ...square[1], ...square[2]].includes(value) ==
-									false
-								) {
-									grid[row][col] = value;
-									if (this.checkGrid(grid)) {
-										this.counter += 1;
-										break;
-									} else {
-										if (this.solveGrid(grid)) {
-											return true;
-										}
-									}
-								}
-							}
-						}
-					}
-					break;
-				}
-			}
-			grid[row][col] = 0;
-		},
-		shuffleSudoku() {
-			let attempts = 10;
-			this.counter = 1;
-
-			while (attempts > 0) {
-				let row = Math.floor(Math.random() * 9);
-				let col = Math.floor(Math.random() * 9);
-
-				while (this.sudoku[row][col] == 0) {
-					row = Math.floor(Math.random() * 9);
-					col = Math.floor(Math.random() * 9);
-				}
-
-				let backup = this.sudoku[row][col];
-				this.sudoku[row][col] = 0;
-
-				let copyGrid = [];
-				for (let i = 0; i < 9; i++) {
-					copyGrid.push([]);
-					for (let j = 0; j < 9; j++) {
-						copyGrid[i].push(this.sudoku[i][j]);
+				} else {
+					this.mistakes++;
+					if (this.mistakes == 3) {
+						this.gameOverMessage = 'Game Over!';
+						this.solved = true;
 					}
 				}
-				this.counter = 0;
-				this.solveGrid(copyGrid);
-
-				if (this.counter != 1) {
-					this.sudoku[row][col] = backup;
-					attempts -= 1;
-				}
 			}
+		},
+		newGame() {
+			this.sudokuGenerator({});
+			this.solved = false;
+			this.mistakes = 0;
 		},
 	},
 };
@@ -259,17 +177,19 @@ export default {
 
 .sudoku-number {
 	border-width: 0.5px;
+	width: 129px;
+	height: 54.8px;
 }
 
 @media (max-width: 640px) {
 	.sudoku-board {
 		width: 250px;
 		height: 250px;
-		margin-top: 1.5rem;
-		margin-bottom: 1.5rem;
 	}
 	.sudoku-number {
-		padding-top: 4.3px;
+		padding-top: 3px;
+		width: 59px;
+		height: 27px;
 		/*padding-bottom: 1.5rem; */
 	}
 }

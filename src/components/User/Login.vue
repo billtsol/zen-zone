@@ -138,7 +138,6 @@ export default {
 	methods: {
 		onSubmit(values, { resetForm }) {
 			if (this.signIn) {
-				console.log("fdf");
 				// sign in
 				this.$store.dispatch('auth/signin', values);
 			} else {

@@ -1,7 +1,7 @@
 <template>
 	<app-header></app-header>
 	<router-view v-if="!isLoading"></router-view>
-	<div class="page_loader text-center mt-40" v-else>
+	<div class="page_loader" v-else>
 		<appLoader />
 	</div>
 </template>
