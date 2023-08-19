@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col items-center pt-10">
-		<div class="flex flex-col">
+		<div class="flex flex-col text-center">
 			<div class="flex flex-row place-content-between sm:text-xl text-xs">
 				<span class="">Mistakes: {{ mistakes }} / 3</span>
 				<span class="mr-4"> {{ sudoku.difficulty }} </span>
@@ -29,18 +29,21 @@
 					<span
 						v-for="(number, col_index) in row"
 						:key="col_index"
-						class="sudoku-number select-none cursor-default w-full sm:p-1 sm:text-3xl border-gray-400 sm:pt-2 sm:pb-2 text-sm bg-blue-100 hover:bg-blue-300"
+						class="sudoku-number select-none cursor-default w-full sm:p-1 sm:text-3xl border-gray-400 sm:pt-2 sm:pb-2 text-sm bg-blue-100"
 						:class="[
 							addBorder(row_index, col_index),
 							number == currentNumber && currentNumber != 0
 								? 'bg-blue-300'
 								: 'bg-blue-100',
+							moreNumbers[parseInt(number) - 1] ? '' : 'hover:bg-blue-300',
 						]"
 					>
 						<div
 							class="w-full h-full"
 							:class="[
-								currentNumber == 0 ? 'cursor-default' : 'cursor-pointer',
+								currentNumber == 0 || number != 0
+									? 'cursor-default'
+									: 'cursor-pointer',
 							]"
 							v-text="number == 0 ? ' ' : number"
 							@click="setNumberInBoard(row_index, col_index)"
@@ -52,13 +55,24 @@
 				>
 					<div
 						v-for="num in numberList"
-						class="sudoku-number m-1 border-2 cursor-pointer sm:text-3xl sm:pt-2 sm:pb-2 p-l text-center rounded-md text-sm bg-blue-100 hover:bg-blue-300"
-						:class="[currentNumber == num ? 'bg-blue-300' : 'bg-blue-100']"
+						class="sudoku-number m-1 border-2 sm:text-3xl sm:pt-2 sm:pb-2 p-l text-center rounded-md text-sm"
+						:class="[
+							currentNumber == num ? 'bg-blue-300' : 'bg-blue-100',
+							moreNumbers[parseInt(num) - 1]
+								? 'cursor-pointer bg-blue-100 hover:bg-blue-300'
+								: 'cursor-default bg-red-500 text-white',
+						]"
 						@click="setCurrectNumber(num)"
 					>
 						<span class="w-full h-full align-middle">{{ num }}</span>
 					</div>
 				</div>
+			</div>
+			<div
+				class="mt-10 select-none cursor-pointer inline-block"
+				@click="sudokuGenerator()"
+			>
+				Reset
 			</div>
 		</div>
 	</div>
@@ -84,6 +98,7 @@ export default {
 			mistakes: 0,
 			gameOverMessage: '',
 			time: 0,
+			moreNumbers: [true, true, true, true, true, true, true, true, true],
 		};
 	},
 	methods: {
@@ -129,7 +144,7 @@ export default {
 		checkSolved() {
 			for (let row = 0; row < 9; row++) {
 				for (let col = 0; col < 9; col++) {
-					if (this.sudoku[row][vol] == 0) {
+					if (this.sudoku.value[row][col] == 0) {
 						return false;
 					}
 				}
@@ -140,6 +155,19 @@ export default {
 			this.currentNumber = number;
 		},
 
+		isNumberActive(number) {
+			let count = 0;
+			for (let row = 0; row < 9; row++) {
+				for (let col = 0; col < 9; col++) {
+					if (this.sudoku.value[row][col] == parseInt(number)) {
+						count++;
+						break;
+					}
+				}
+			}
+			return count == 9;
+		},
+
 		setNumberInBoard(row, col) {
 			if (this.sudoku.value[row][col] == 0 && this.currentNumber != 0) {
 				if (this.currentNumber == this.sudoku.solution[row][col]) {
@@ -148,6 +176,12 @@ export default {
 						col: col,
 						number: this.currentNumber,
 					});
+
+					if (this.isNumberActive(this.currentNumber)) {
+						this.moreNumbers[this.currentNumber - 1] = false;
+						this.currentNumber = 0;
+					}
+
 					if (this.checkSolved()) {
 						this.gameOverMessage = 'You won!';
 						this.solved = true;
