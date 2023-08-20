@@ -6,7 +6,7 @@
 				<span class="mr-4"> {{ sudoku.difficulty }} </span>
 				<span class="">Time: {{ timeConvertor() }}</span>
 			</div>
-			<div class="sudoku-board sm:mb-20 border-4 rounded border-gray-700">
+			<div class="sudoku-board sm:mb-20 border-2 rounded border-gray-700">
 				<div
 					v-if="solved"
 					class="w-full h-full flex flex-col justify-center items-center"
@@ -26,10 +26,10 @@
 					:key="row_index"
 					class="w-full flex flex-row justify-around text-center"
 				>
-					<span
+					<div
 						v-for="(number, col_index) in row"
 						:key="col_index"
-						class="sudoku-number select-none cursor-default w-full sm:p-1 sm:text-3xl border-gray-400 sm:pt-2 sm:pb-2 text-sm bg-blue-100"
+						class="sudoku-number flex justify-center items-center select-none cursor-default w-full sm:p-1 sm:text-3xl border-gray-400 sm:pt-2 sm:pb-2 text-2xl bg-blue-100"
 						:class="[
 							addBorder(row_index, col_index),
 							number == currentNumber && currentNumber != 0
@@ -39,7 +39,7 @@
 						]"
 					>
 						<div
-							class="w-full h-full"
+							class=""
 							:class="[
 								currentNumber == 0 || number != 0
 									? 'cursor-default'
@@ -48,14 +48,14 @@
 							v-text="number == 0 ? ' ' : number"
 							@click="setNumberInBoard(row_index, col_index)"
 						></div>
-					</span>
+					</div>
 				</div>
 				<div
 					class="select-none w-full flex flex-row items-center justify-around mt-4"
 				>
 					<div
 						v-for="num in numberList"
-						class="sudoku-number m-1 border-2 sm:text-3xl sm:pt-2 sm:pb-2 p-l text-center rounded-md text-sm"
+						class="sudoku-number mt-1 m-0.5 sm:text-3xl text-center rounded-md text-2xl flex justify-center items-center"
 						:class="[
 							currentNumber == num ? 'bg-blue-300' : 'bg-blue-100',
 							moreNumbers[parseInt(num) - 1]
@@ -64,15 +64,15 @@
 						]"
 						@click="setCurrectNumber(num)"
 					>
-						<span class="w-full h-full align-middle">{{ num }}</span>
+						<span class="">{{ num }}</span>
 					</div>
 				</div>
-			</div>
-			<div
-				class="mt-10 select-none cursor-pointer inline-block"
-				@click="sudokuGenerator()"
-			>
-				Reset
+				<div
+					class="mt-7 border-2 rounded p-1 bg-gray-200 select-none cursor-pointer inline-block"
+					@click="sudokuGenerator()"
+				>
+					Reset
+				</div>
 			</div>
 		</div>
 	</div>
@@ -133,11 +133,11 @@ export default {
 		addBorder(row_index, col_index) {
 			if (col_index == 2 || col_index == 5) {
 				if (row_index == 2 || row_index == 5) {
-					return '!border-b-4 !border-r-4 !border-r-gray-700 !border-b-gray-700';
+					return '!border-b-2 !border-r-2 !border-r-gray-700 !border-b-gray-700';
 				}
-				return '!border-r-4 !border-r-gray-700';
+				return '!border-r-2 !border-r-gray-700';
 			} else if (row_index == 2 || row_index == 5) {
-				return '!border-b-4 !border-b-gray-700';
+				return '!border-b-2 !border-b-gray-700';
 			}
 			return '';
 		},
@@ -212,19 +212,17 @@ export default {
 .sudoku-number {
 	border-width: 0.5px;
 	width: 129px;
-	height: 54.8px;
+	height: 55.1px;
 }
 
 @media (max-width: 640px) {
 	.sudoku-board {
-		width: 250px;
-		height: 250px;
+		width: 350px;
+		height: 375px;
 	}
 	.sudoku-number {
-		padding-top: 3px;
-		width: 59px;
-		height: 27px;
-		/*padding-bottom: 1.5rem; */
+		width: 100%;
+		height: 41.25px;
 	}
 }
 </style>

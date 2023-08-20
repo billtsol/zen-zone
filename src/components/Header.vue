@@ -1,6 +1,6 @@
 <template>
 	<header
-		class="w-full select-none bg-blue-700 p-6 flex place-content-around font-bold"
+		class="w-full select-none bg-blue-700 p-4 flex place-content-around font-bold"
 	>
 		<h1 class="inline p-2">
 			<span class="text-xl text-gray-50 cursor-pointer">
