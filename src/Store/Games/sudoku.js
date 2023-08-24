@@ -41,6 +41,19 @@ const sudokuModule = {
 		setMoreNumbers(state, payload) {
 			state.moreNumbers[payload.index] = payload.value;
 		},
+		setDefaultMoreNumbers(state) {
+			state.moreNumbers = [
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+				true,
+			];
+		},
 	},
 	getters: {
 		isSolved(state) {
@@ -86,6 +99,7 @@ const sudokuModule = {
 
 				commit('setSolved', false);
 				commit('setMistakes');
+				commit('setDefaultMoreNumbers');
 
 				commit('setSudoku', myData);
 			} catch (error) {

@@ -34,6 +34,7 @@
 							addBorder(row_index, col_index),
 							setCursor(number),
 							...boardNumbersStyle(number),
+							number != 0 ? globalStyle[parseInt(number) - 1] : '',
 						]"
 					>
 						<div
@@ -42,12 +43,14 @@
 								number == 0 && currentNumber != 0
 									? 'hover:cursor-pointer'
 									: 'hover:cursor-default',
+								,
 							]"
 							@click="
 								setNumberInBoard({
 									row: row_index,
 									col: col_index,
-								})
+								}),
+									showNumbers(parseInt(number))
 							"
 						>
 							{{ number }}
@@ -99,6 +102,7 @@ export default {
 		return {
 			numberList: [1, 2, 3, 4, 5, 6, 7, 8, 9],
 			time: 0,
+			globalStyle: ['', '', '', '', '', '', '', '', ''],
 		};
 	},
 	methods: {
@@ -181,7 +185,16 @@ export default {
 		},
 		setCursor(number) {
 			if (number == 0) {
-				return ' hover:text-blue-300 text-blue-100';
+				return 'hover:text-blue-300 text-blue-100';
+			}
+		},
+		showNumbers(number) {
+			for (let i = 0; i < 9; i++) {
+				this.globalStyle[i] = 'bg-blue-100';
+			}
+			if (number != 0) {
+				this.globalStyle[number - 1] = 'bg-blue-300';
+				this.setNewCurrectNumber({ number: number });
 			}
 		},
 	},

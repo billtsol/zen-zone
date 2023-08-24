@@ -14,7 +14,7 @@
 			<!-- Username Field -->
 			<div v-if="!signIn">
 
-        <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Username</label>
+        <label for="username" class="block text-sm font-medium leading-6 text-gray-900">Username</label>
 
         <div class="mt-2">
 					<Field
